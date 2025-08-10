@@ -51,22 +51,22 @@ Our system uses a robust 4-layer architecture ensuring security, scalability, an
 graph TB
     subgraph Frontend["🖥️ Frontend Layer"]
         UI[Next.js Portfolio UI]
-        Voice[Voice Interface<br/>Wake Word + STT/TTS]
+        Voice["Voice Interface: Wake Word + STT/TTS"]
         Auth[Supabase Auth]
     end
     
     subgraph Gateway["🚪 API Gateway Layer (Single Entry Point)"]
         GW[FastAPI Gateway]
-        AuthMW[JWT Verify + RBAC]
-        Cost[Cost Metering + Budgets]
+        AuthMW["JWT Verify + RBAC"]
+        Cost["Cost Metering + Budgets"]
         RateLimit[Rate Limiting]
         MCPClient[MCP Client]
     end
     
     subgraph Services["🧠 Core Services Layer"]
-        RAG[RAG Service<br/>Vector Search + Citations]
-        Memory[Memory Engine<br/>10-turn Summaries]
-        Orchestrator[MCP Orchestrator<br/>Tool Selection]
+        RAG["RAG Service: Vector Search + Citations"]
+        Memory["Memory Engine: 10-turn Summaries"]
+        Orchestrator["MCP Orchestrator: Tool Selection"]
     end
     
     subgraph Tools["🛠️ MCP Tool Servers"]
@@ -74,7 +74,7 @@ graph TB
         Projects[projects-tools]
         KB[kb-tools]
         Demo[demo-tools]
-        DBTool[db-tools<br/>(read-only)]
+        DBTool["db-tools (read-only)"]
     end
     
     subgraph Data["📊 Data Layer"]
@@ -85,7 +85,7 @@ graph TB
     end
     
     subgraph External["🌐 External Services"]
-        Claude[Claude API<br/>Anthropic]
+        Claude["Claude API (Anthropic)"]
         Supabase[Supabase Backend]
         ElevenLabs[ElevenLabs TTS]
     end
@@ -184,7 +184,7 @@ sequenceDiagram
     Tools-->>Orchestrator: Project information + citations
     
     Orchestrator->>Claude: Generate response with full context
-    Note over Claude: Uses conversation history +<br/>project data + user preferences
+    Note over Claude: Uses conversation history + project data + user preferences
     Claude-->>Orchestrator: AI response with citations
     
     Orchestrator->>Tools: save_conversation_tool()
@@ -203,17 +203,11 @@ This shows how conversations are progressively refined into intelligent, long-te
 
 ```mermaid
 graph TD
-    A[Raw Conversation Turns] -->|Every 10 Turns| B[Short-term Summary<br/>session_summaries]
-    A -->|Continuous| C[Discrete Memory Items<br/>user_memory_items]
-    B -->|Session End| D[Long-term User Profile<br/>user_profiles.long_term_summary]
+    A[Raw Conversation Turns] -->|Every 10 Turns| B["Short-term Summary (session_summaries)"]
+    A -->|Continuous| C["Discrete Memory Items (user_memory_items)"]
+    B -->|Session End| D["Long-term User Profile (user_profiles.long_term_summary)"]
     C -->|Session End| D
-    D -->|Next Session| E[Personalized Greeting<br/>& Context Loading]
-    
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#f3e5f5
-    style D fill:#e8f5e8
-    style E fill:#fff3e0
+    D -->|Next Session| E["Personalized Greeting & Context Loading"]
 ```
 
 Key innovation: `user_memory_items` stores specific, long-term facts about each user (like their interests or past conversation topics), while `cost_events` provides granular tracking of API usage and operational costs for sustainable operation.
@@ -354,23 +348,23 @@ The Model Context Protocol (MCP) orchestrator intelligently selects and chains t
 ```mermaid
 graph TB
     subgraph Orchestrator["🧠 MCP Orchestrator"]
-        Engine[Central Decision Engine<br/>Analyzes query → Selects tools → Chains responses]
+        Engine["Central Decision Engine: Analyzes query → Selects tools → Chains responses"]
     end
     
     subgraph Core["📚 Core Knowledge Tools"]
-        ProfileTool[profile_tool<br/>• get_intro<br/>• get_timeline<br/>• get_skills<br/>• get_current_roles]
-        ProjectsTool[projects_tool<br/>• list_projects<br/>• get_details<br/>• get_tech_stack<br/>• show_demo]
-        KnowledgeTool[knowledge_tool<br/>• search_rag<br/>• get_citations<br/>• find_similar]
+        ProfileTool["profile_tool: get_intro, get_timeline, get_skills, get_current_roles"]
+        ProjectsTool["projects_tool: list_projects, get_details, get_tech_stack, show_demo"]
+        KnowledgeTool["knowledge_tool: search_rag, get_citations, find_similar"]
     end
     
     subgraph Memory["🧠 Memory Tools"]
-        UserMemoryTool[user_memory_tool<br/>• get_history<br/>• update_context<br/>• personalized_greeting<br/>• extract_facts]
-        ConversationTool[conversation_tool<br/>• save_turn<br/>• create_summary<br/>• get_context<br/>• manage_session]
+        UserMemoryTool["user_memory_tool: get_history, update_context, personalized_greeting, extract_facts"]
+        ConversationTool["conversation_tool: save_turn, create_summary, get_context, manage_session"]
     end
     
     subgraph Interactive["🎯 Interactive Tools"]
-        DemoTool[demo_tool<br/>• open_modal<br/>• show_code<br/>• live_preview<br/>• github_link]
-        QueryTool[query_tool<br/>• nl_to_sql<br/>• describe_schema<br/>• safe_execute<br/>• explain_results]
+        DemoTool["demo_tool: open_modal, show_code, live_preview, github_link"]
+        QueryTool["query_tool: nl_to_sql, describe_schema, safe_execute, explain_results"]
     end
     
     Engine --> ProfileTool
@@ -405,20 +399,20 @@ The API architecture demonstrates production-grade design with proper separation
 ```mermaid
 graph TB
     subgraph Public["🌐 Public Endpoints"]
-        Auth[POST /auth/login<br/>POST /auth/register<br/>POST /auth/refresh<br/>POST /auth/logout]
-        Chat[POST /chat<br/>WebSocket /ws]
+        Auth["POST /auth/login, POST /auth/register, POST /auth/refresh, POST /auth/logout"]
+        Chat["POST /chat, WebSocket /ws"]
     end
     
     subgraph User["👤 User Endpoints (Bearer Token)"]
-        UserAPI[GET /api/me/profile<br/>GET /api/me/sessions<br/>GET /api/me/export<br/>DELETE /api/me/forget]
+        UserAPI["GET /api/me/profile, GET /api/me/sessions, GET /api/me/export, DELETE /api/me/forget"]
     end
     
     subgraph Admin["👑 Admin Endpoints (Admin Token)"]
-        AdminAPI[GET /admin/analytics<br/>GET /admin/costs<br/>GET /admin/users<br/>POST /admin/api-keys]
+        AdminAPI["GET /admin/analytics, GET /admin/costs, GET /admin/users, POST /admin/api-keys"]
     end
     
     subgraph Internal["🔒 MCP Internal (Service Token)"]
-        MCPEndpoints[POST /mcp/profile/*<br/>POST /mcp/projects/*<br/>POST /mcp/memory/*<br/>POST /mcp/conversation/*<br/>POST /mcp/demo/*<br/>POST /mcp/query/*]
+        MCPEndpoints["POST /mcp/profile/*, POST /mcp/projects/*, POST /mcp/memory/*, POST /mcp/conversation/*, POST /mcp/demo/*, POST /mcp/query/*"]
     end
     
     Gateway[API Gateway] --> Auth
@@ -700,30 +694,30 @@ Our development is structured in four key milestones, demonstrating systematic a
 ```mermaid
 graph TB
     subgraph CDN["🌐 CDN Layer"]
-        CloudFlare[CloudFlare CDN<br/>Global Edge Caching<br/>DDoS Protection]
+        CloudFlare["CloudFlare CDN: Global Edge Caching, DDoS Protection"]
     end
     
     subgraph Frontend["🖥️ Frontend Hosting"]
-        Vercel[Vercel<br/>Next.js App<br/>Global Deployment<br/>Automatic Scaling]
+        Vercel["Vercel: Next.js App, Global Deployment, Automatic Scaling"]
     end
     
     subgraph Backend["⚙️ Backend Services"]
-        Railway[Railway<br/>FastAPI + MCP<br/>Auto-scaling<br/>Health Monitoring]
+        Railway["Railway: FastAPI + MCP, Auto-scaling, Health Monitoring"]
     end
     
     subgraph Database["📊 Database Services"]
-        SupabaseDB[Supabase<br/>PostgreSQL + pgvector<br/>Managed Backups<br/>Global Replication]
+        SupabaseDB["Supabase: PostgreSQL + pgvector, Managed Backups, Global Replication"]
     end
     
     subgraph External["🤖 AI Services"]
-        Anthropic[Claude API<br/>Anthropic<br/>Global Edge Network]
-        ElevenLabs[ElevenLabs<br/>Text-to-Speech<br/>Voice Synthesis]
+        Anthropic["Claude API (Anthropic): Global Edge Network"]
+        ElevenLabs["ElevenLabs: Text-to-Speech, Voice Synthesis"]
     end
     
     subgraph Monitoring["📊 Observability"]
-        Analytics[PostHog Analytics<br/>User Behavior Tracking]
-        Logs[Structured Logging<br/>Error Tracking]
-        Metrics[Performance Metrics<br/>Cost Monitoring]
+        Analytics["PostHog Analytics: User Behavior Tracking"]
+        Logs["Structured Logging: Error Tracking"]
+        Metrics["Performance Metrics: Cost Monitoring"]
     end
     
     CloudFlare --> Vercel
