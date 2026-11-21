@@ -29,4 +29,4 @@ jobs:
           path-to-signatures: signatures/cla.json
           path-to-document: https://github.com/LSG-hub/Project-001/blob/main/CLA.md
           branch: cla-signatures
-          allowlist: LSG-hub,dependabot[bot],github-actions[bot]
+          allowlist: LSG-hub,Claude*,dependabot[bot],github-actions[bot]
