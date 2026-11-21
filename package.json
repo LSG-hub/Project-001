@@ -1,7 +1,7 @@
 {
   "name": "project001",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.2.1",
   "description": "Project 001: a voice assistant that answers your phone, built on Gemini Live.",
   "workspaces": [
     "apps/*",

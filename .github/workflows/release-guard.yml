@@ -1,11 +1,13 @@
 name: Release guard
 
-# main is production: it only accepts pull requests from dev.
+# main is production: it only accepts pull requests from dev, and every release
+# must bump the version and add release notes.
 on:
   pull_request:
     branches: [main]
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   source-is-dev:
@@ -20,3 +22,25 @@ jobs:
             exit 1
           fi
           echo "Source branch is dev."
+
+  version-bumped:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check the version and changelog
+        run: |
+          NEW=$(node -p "require('./package.json').version")
+          OLD=$(git show origin/main:package.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).version))")
+          echo "prod: $OLD, this release: $NEW"
+          node -e "
+            const [a, b] = [process.argv[1], process.argv[2]].map(v => v.split('.').map(Number));
+            const newer = a[0] !== b[0] ? a[0] > b[0] : a[1] !== b[1] ? a[1] > b[1] : a[2] > b[2];
+            if (!newer) { console.error('::error::Bump the version in package.json above ' + process.argv[2] + ' (see docs/RELEASING.md).'); process.exit(1); }
+          " "$NEW" "$OLD"
+          if ! grep -q "^## \[$NEW\]" CHANGELOG.md; then
+            echo "::error::Add a '## [$NEW] - date' section to CHANGELOG.md with the release notes."
+            exit 1
+          fi
+          echo "Version $NEW is new and has release notes."
