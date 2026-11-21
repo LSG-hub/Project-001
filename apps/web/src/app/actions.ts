@@ -1,5 +1,6 @@
 'use server'
 
+import { notifyNewSignup } from '@/lib/notify'
 import { getWaitlistStore } from '@/lib/waitlist/store'
 import { parseSignup } from '@/lib/waitlist/validate'
 
@@ -39,6 +40,11 @@ export async function joinWaitlist(
 
   try {
     const { entry, alreadyJoined } = await getWaitlistStore().join(parsed.email, parsed.ref)
+    if (!alreadyJoined) {
+      // SITE_URL is set per Cloud Run service (dev or prod), read at request time.
+      const site = process.env.SITE_URL ?? 'https://001.sreenivasgurram.com'
+      await notifyNewSignup(entry, site)
+    }
     return {
       status: 'joined',
       email: entry.email,

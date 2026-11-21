@@ -1,9 +1,17 @@
 import type { Metadata } from 'next'
+import { JsonLd } from '@/components/json-ld'
 import { CONTACT_EMAIL, SiteFooter, SiteHeader } from '@/components/site'
+import { pages } from '@/lib/content'
 
 export const metadata: Metadata = {
-  title: 'Privacy · Project 001',
-  description: 'What we collect on the Project 001 waitlist and how we use it.',
+  title: pages.privacy.title,
+  description: pages.privacy.description,
+  alternates: { canonical: pages.privacy.path },
+  openGraph: {
+    title: pages.privacy.shortTitle,
+    description: pages.privacy.description,
+    url: pages.privacy.path,
+  },
 }
 
 export default function PrivacyPage() {
@@ -11,6 +19,7 @@ export default function PrivacyPage() {
     <>
       <SiteHeader cta={false} />
       <main className="mx-auto max-w-[720px] px-4 pt-10 pb-20 sm:px-6">
+        <JsonLd page="privacy" />
         <h1 className="font-display text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
           Privacy
         </h1>

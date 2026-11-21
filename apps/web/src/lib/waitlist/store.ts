@@ -12,29 +12,40 @@ export type WaitlistEntry = {
   createdAt: string
 }
 
+export type ListedEntry = WaitlistEntry & { id: string }
+
 export type JoinResult = { entry: WaitlistEntry; alreadyJoined: boolean }
 
 export interface WaitlistStore {
   join(email: string, referredBy: string | null): Promise<JoinResult>
+  /** All entries, oldest first. Admin only. */
+  list(): Promise<ListedEntry[]>
+  /** Removes one entry (for deletion requests). Positions of others don't change. */
+  remove(id: string): Promise<boolean>
 }
 
 /** Document id: a hash of the email, so ids never expose addresses. */
-function idFor(email: string): string {
+export function idFor(email: string): string {
   return createHash('sha256').update(email).digest('hex').slice(0, 32)
 }
 
 /**
- * Firestore store, used in production on Cloud Run (credentials come from the
- * service account) or locally against the emulator (FIRESTORE_EMULATOR_HOST).
+ * Firestore store, used on Cloud Run (credentials come from the service account)
+ * or locally against the emulator (FIRESTORE_EMULATOR_HOST).
  */
 class FirestoreWaitlistStore implements WaitlistStore {
-  async join(email: string, referredBy: string | null): Promise<JoinResult> {
+  private async db() {
     const { Firestore, FieldValue } = await import('@google-cloud/firestore')
     // Prod uses the (default) database; the dev site sets FIRESTORE_DATABASE=development.
     const db = new Firestore({
       projectId: process.env.GOOGLE_CLOUD_PROJECT,
       databaseId: process.env.FIRESTORE_DATABASE || '(default)',
     })
+    return { db, FieldValue }
+  }
+
+  async join(email: string, referredBy: string | null): Promise<JoinResult> {
+    const { db, FieldValue } = await this.db()
     const ref = db.collection('waitlist').doc(idFor(email))
     const counter = db.collection('meta').doc('waitlist')
 
@@ -57,6 +68,21 @@ class FirestoreWaitlistStore implements WaitlistStore {
       return { entry, alreadyJoined: false }
     })
   }
+
+  async list(): Promise<ListedEntry[]> {
+    const { db } = await this.db()
+    const snap = await db.collection('waitlist').orderBy('position', 'asc').get()
+    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as WaitlistEntry) }))
+  }
+
+  async remove(id: string): Promise<boolean> {
+    const { db } = await this.db()
+    const ref = db.collection('waitlist').doc(id)
+    const doc = await ref.get()
+    if (!doc.exists) return false
+    await ref.delete()
+    return true
+  }
 }
 
 /**
@@ -68,22 +94,41 @@ class FileWaitlistStore implements WaitlistStore {
   private queue: Promise<unknown> = Promise.resolve()
 
   join(email: string, referredBy: string | null): Promise<JoinResult> {
-    const run = this.queue.then(async () => {
+    return this.serial(async () => {
       const entries = await this.read()
       const found = entries.find((e) => e.email === email)
       if (found) return { entry: found, alreadyJoined: true }
+      const last = entries.at(-1)?.position ?? 0
       const entry: WaitlistEntry = {
         email,
         referralCode: makeReferralCode(),
         referredBy,
-        position: entries.length + 1,
+        position: last + 1,
         createdAt: new Date().toISOString(),
       }
       entries.push(entry)
-      await mkdir(path.dirname(this.file), { recursive: true })
-      await writeFile(this.file, JSON.stringify(entries, null, 2))
+      await this.write(entries)
       return { entry, alreadyJoined: false }
     })
+  }
+
+  async list(): Promise<ListedEntry[]> {
+    const entries = await this.read()
+    return entries.map((e) => ({ id: idFor(e.email), ...e }))
+  }
+
+  remove(id: string): Promise<boolean> {
+    return this.serial(async () => {
+      const entries = await this.read()
+      const next = entries.filter((e) => idFor(e.email) !== id)
+      if (next.length === entries.length) return false
+      await this.write(next)
+      return true
+    })
+  }
+
+  private serial<T>(fn: () => Promise<T>): Promise<T> {
+    const run = this.queue.then(fn)
     this.queue = run.catch(() => undefined)
     return run
   }
@@ -94,6 +139,11 @@ class FileWaitlistStore implements WaitlistStore {
     } catch {
       return []
     }
+  }
+
+  private async write(entries: WaitlistEntry[]) {
+    await mkdir(path.dirname(this.file), { recursive: true })
+    await writeFile(this.file, JSON.stringify(entries, null, 2))
   }
 }
 
