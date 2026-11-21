@@ -1,0 +1,21 @@
+{
+  "hosting": [
+    {
+      "target": "prod",
+      "public": "apps/web/public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [{ "source": "**", "run": { "serviceId": "web", "region": "asia-south1" } }]
+    },
+    {
+      "target": "dev",
+      "public": "apps/web/public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "headers": [{ "source": "**", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }],
+      "rewrites": [{ "source": "**", "run": { "serviceId": "web-dev", "region": "asia-south1" } }]
+    }
+  ],
+  "firestore": [
+    { "database": "(default)", "rules": "firestore.rules" },
+    { "database": "development", "rules": "firestore.rules" }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "project001",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Project 001: a voice assistant that answers your phone, built on Gemini Live.",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:web": "npm run dev -w @project001/web",
+    "build:web": "npm run build -w @project001/web",
+    "build": "npm run build:web",
+    "lint": "biome check apps",
+    "lint:fix": "biome check --write apps",
+    "test": "npm test -w @project001/web"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "typescript": "^5.9.2"
+  },
+  "license": "AGPL-3.0-only"
+}

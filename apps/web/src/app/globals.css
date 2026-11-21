@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f7f7f4;
+  --color-card: #ffffff;
+  --color-ink: #111312;
+  --color-body: #3d4240;
+  --color-dim: #5a605d;
+  --color-line: #e2e3de;
+  --color-line-strong: #d9dbd5;
+  --color-soft: #f1f2ee;
+  --color-green: #0a7a53;
+  --color-green-deep: #075c3f;
+  --color-mint: #ddf3e6;
+  --color-mint-line: #cfe8da;
+  --color-mint-bright: #7be0b0;
+  --color-night: #24302b;
+  --color-amber-bg: #fdf1dc;
+  --color-amber-ink: #8a4a06;
+  --color-alert-bg: #fde8e6;
+  --color-alert-line: #f6c9c4;
+  --color-alert-ink: #a11b12;
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-geist), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-mint);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.28s ease-out both;
+}
+
+.animate-bar {
+  transform-origin: center;
+  animation: bar 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-rise,
+  .animate-bar {
+    animation: none;
+  }
+}

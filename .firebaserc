@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "project-001-474105"
+  },
+  "targets": {
+    "project-001-474105": {
+      "hosting": {
+        "prod": [
+          "project-001-474105"
+        ],
+        "dev": [
+          "project-001-474105-dev"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
