@@ -3,6 +3,8 @@ name: Deploy website
 # dev  -> Cloud Run web-dev -> dev.001.sreenivasgurram.com
 # main -> Cloud Run web     -> 001.sreenivasgurram.com
 # Signs in to Google Cloud with Workload Identity Federation: no keys stored in GitHub.
+# After each Cloud Run deploy it publishes a new Firebase Hosting release, which
+# clears the CDN cache (Next marks static pages cacheable for a year).
 on:
   push:
     branches: [dev, main]
@@ -10,6 +12,7 @@ on:
       - apps/web/**
       - package.json
       - package-lock.json
+      - firebase.json
       - .github/workflows/deploy-web.yml
   workflow_dispatch:
 
@@ -55,3 +58,15 @@ jobs:
           gcloud run deploy "$SERVICE" \
             --project "$PROJECT_ID" --region "$REGION" \
             --image "$IMAGE:$GITHUB_SHA" --quiet
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Clear the CDN cache (new Firebase Hosting release)
+        env:
+          TARGET: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+        run: |
+          npx --yes firebase-tools@15.26.0 deploy --only "hosting:$TARGET" \
+            --project "$PROJECT_ID" --non-interactive --force \
+            --message "Cloud Run ${{ github.sha }}"
