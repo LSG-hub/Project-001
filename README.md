@@ -27,9 +27,17 @@ Open http://localhost:5301. In development, waitlist sign-ups are saved to `apps
 npm test -w @project001/web
 ```
 
-## Deploy the website (not done yet)
+## Deploy the website
 
-The site is built as a container from `apps/web/Dockerfile` and runs on Cloud Run (`web`, asia-south1). Firebase Hosting rewrites every path to it (see `firebase.json`). Firestore must exist in the project before the waitlist works in production.
+The site runs as a container on Cloud Run (`web`, asia-south1). Firebase Hosting rewrites every path on 001.sreenivasgurram.com to it, and waitlist sign-ups go to Firestore (asia-south1).
+
+```bash
+export CLOUDSDK_ACTIVE_CONFIG_NAME=personal
+gcloud builds submit --config cloudbuild.web.yaml --project project-001-474105 --region asia-south1
+gcloud run deploy web --project project-001-474105 --region asia-south1 \
+  --image asia-south1-docker.pkg.dev/project-001-474105/web/web:latest
+firebase deploy --only hosting,firestore:rules --project project-001-474105   # only when firebase.json or rules change
+```
 
 The Firebase project is `project-001-474105`. See [docs/infra/gcp.md](docs/infra/gcp.md).
 

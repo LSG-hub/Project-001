@@ -1,0 +1,12 @@
+# Builds the website image. Run from the repo root:
+#   gcloud builds submit --config cloudbuild.web.yaml --project project-001-474105
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-f', 'apps/web/Dockerfile', '-t', '${_IMAGE}:$BUILD_ID', '-t', '${_IMAGE}:latest', '.']
+images:
+  - '${_IMAGE}:$BUILD_ID'
+  - '${_IMAGE}:latest'
+substitutions:
+  _IMAGE: asia-south1-docker.pkg.dev/project-001-474105/web/web
+options:
+  logging: CLOUD_LOGGING_ONLY

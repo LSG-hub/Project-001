@@ -1,0 +1,11 @@
+# Files Cloud Build never uploads
+.git
+.gitignore
+node_modules/
+**/node_modules/
+**/.next/
+**/.data/
+docs/private/
+.firebase/
+*.log
+.env*

@@ -1,12 +1,22 @@
 {
   "hosting": {
     "public": "apps/web/public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "rewrites": [
       {
         "source": "**",
-        "run": { "serviceId": "web", "region": "asia-south1" }
+        "run": {
+          "serviceId": "web",
+          "region": "asia-south1"
+        }
       }
     ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
