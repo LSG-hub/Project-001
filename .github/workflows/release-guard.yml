@@ -1,0 +1,22 @@
+name: Release guard
+
+# main is production: it only accepts pull requests from dev.
+on:
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  source-is-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "$HEAD_REF" != "dev" ]; then
+            echo "::error::Pull requests into main must come from dev (this one comes from '$HEAD_REF')."
+            exit 1
+          fi
+          echo "Source branch is dev."

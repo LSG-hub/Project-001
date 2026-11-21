@@ -30,7 +30,11 @@ function idFor(email: string): string {
 class FirestoreWaitlistStore implements WaitlistStore {
   async join(email: string, referredBy: string | null): Promise<JoinResult> {
     const { Firestore, FieldValue } = await import('@google-cloud/firestore')
-    const db = new Firestore({ projectId: process.env.GOOGLE_CLOUD_PROJECT })
+    // Prod uses the (default) database; the dev site sets FIRESTORE_DATABASE=development.
+    const db = new Firestore({
+      projectId: process.env.GOOGLE_CLOUD_PROJECT,
+      databaseId: process.env.FIRESTORE_DATABASE || '(default)',
+    })
     const ref = db.collection('waitlist').doc(idFor(email))
     const counter = db.collection('meta').doc('waitlist')
 
