@@ -24,8 +24,14 @@ npm run dev:web
 Open http://localhost:5301. In development, waitlist sign-ups are saved to `apps/web/.data/waitlist.json` (git-ignored). Set `WAITLIST_STORE=firestore` or `FIRESTORE_EMULATOR_HOST` to use Firestore instead.
 
 ```bash
-npm test -w @project001/web
+npm test
 ```
+
+**Admin:** `/admin` lists waitlist sign-ups (export to CSV, delete on request). It's protected by a password hash and a signed session cookie. Create both values with `npm run admin:hash -w @project001/web` and put them in `apps/web/.env.local` (see `apps/web/.env.example`).
+
+**Search and AI discovery:** `robots.txt`, `sitemap.xml`, `llms.txt` and `llms-full.txt` (for AI assistants), a web manifest, per-page share images and schema.org JSON-LD (WebSite, Organization, MobileApplication, FAQPage) are generated from `apps/web/src/lib/content.ts`, which also holds the page copy and FAQs.
+
+**Sign-up emails:** set the `SMTP_*` and `NOTIFY_*` values in `.env.local` (any SMTP server, e.g. Zoho with an app password) to get an email for each new sign-up. Without them, the notification is only logged.
 
 ## Branches and deploys
 

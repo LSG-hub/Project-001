@@ -130,7 +130,7 @@ function JoinedCard({ state }: { state: Extract<WaitlistState, { status: 'joined
   useEffect(() => setOrigin(window.location.origin), [])
 
   const link = state.referralCode ? `${origin}/?ref=${state.referralCode}` : origin
-  const shareText = `I joined the waitlist for an AI assistant that answers scam calls for you and your family. Join here: ${link}`
+  const shareText = `I joined the waitlist for an AI assistant that takes your calls for you, and keeps scammers away from your family. Join here: ${link}`
 
   async function copy() {
     try {
@@ -149,7 +149,7 @@ function JoinedCard({ state }: { state: Extract<WaitlistState, { status: 'joined
       <p className="mt-1.5 text-[15px] leading-relaxed text-body">
         {state.position > 0 ? <>You’re number {state.position}. </> : null}
         We’ll email <span className="font-medium text-ink">{state.email}</span> when it’s your turn.
-        Know someone whose parents get these calls? Send them the link.
+        Know someone who’d love this? Send them the link.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <a
