@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Bricolage_Grotesque, Geist, Geist_Mono } from 'next/font/google'
+import { SITE_NAME, SITE_URL } from '@/lib/content'
 import './globals.css'
 
 const geist = Geist({ variable: '--font-geist', subsets: ['latin'] })
@@ -10,22 +11,23 @@ const bricolage = Bricolage_Grotesque({
   weight: ['600', '700'],
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://001.sreenivasgurram.com'
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: 'Project 001: the assistant that answers scam calls for your family',
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  alternates: { canonical: '/' },
+  title: 'Project 001: an AI assistant that takes your calls',
   description:
-    'Unknown callers reach your assistant first, on your phone or your parents’, even a basic one. It talks to them in their language, lets real people through and alerts you when a scammer tries.',
+    'An AI assistant that answers your phone. It handles the calls you’d rather not take, stops scammers before they reach your family, and tells you what matters. Even on a basic phone.',
   openGraph: {
     title: 'Project 001',
-    description: 'Scammers call. Your assistant answers. Join the early-access waitlist.',
+    description: 'Let your assistant take the call. Join the early-access waitlist.',
     url: '/',
     siteName: 'Project 001',
     locale: 'en_IN',
     type: 'website',
   },
   twitter: { card: 'summary_large_image' },
+  formatDetection: { telephone: false },
 }
 
 export const viewport: Viewport = {
