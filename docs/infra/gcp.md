@@ -39,3 +39,25 @@ Notes:
 gcloud config configurations activate personal
 gcloud config set project project-001-474105
 ```
+
+## Environments and release flow (set up 2026-11-21)
+
+| | Dev | Prod |
+|---|---|---|
+| Branch | `dev` (default branch) | `main` |
+| Address | https://dev.001.sreenivasgurram.com (noindex) | https://001.sreenivasgurram.com |
+| Firebase Hosting site | `project-001-474105-dev` (target `dev`) | `project-001-474105` (target `prod`) |
+| Cloud Run service | `web-dev` | `web` |
+| Firestore database | `development` | `(default)` |
+
+**Flow:** feature branch → PR into `dev` → merge (auto-deploys dev) → PR `dev` → `main` → merge (auto-deploys prod).
+
+**Rules:**
+- `main` only accepts PRs from `dev` (the `source-is-dev` check).
+- Both branches require PRs and a passing `lint-test-build` check.
+- Force pushes and branch deletion are blocked.
+
+**Deploys** (`.github/workflows/deploy-web.yml`):
+- Run on pushes to `dev` and `main` that touch the website.
+- GitHub signs in through Workload Identity Federation: pool `github`, provider `lsg-hub`, limited to `LSG-hub/Project-001` on `refs/heads/dev` and `refs/heads/main`. It acts as `github-deployer`, which has `run.developer`, `artifactregistry.writer` on repo `web`, and `serviceAccountUser` on `web-runtime`. No keys are stored in GitHub.
+- Firebase Hosting config and Firestore rules are deployed by hand when they change: `firebase deploy --only hosting:dev,hosting:prod,firestore:rules`.

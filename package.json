@@ -15,8 +15,9 @@
     "dev:web": "npm run dev -w @project001/web",
     "build:web": "npm run build -w @project001/web",
     "build": "npm run build:web",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write ."
+    "lint": "biome check apps",
+    "lint:fix": "biome check --write apps",
+    "test": "npm test -w @project001/web"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",

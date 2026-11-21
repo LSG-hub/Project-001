@@ -27,7 +27,13 @@ Open http://localhost:5301. In development, waitlist sign-ups are saved to `apps
 npm test -w @project001/web
 ```
 
-## Deploy the website
+## Branches and deploys
+
+- `dev` is the default branch and the dev site: https://dev.001.sreenivasgurram.com
+- `main` is production and only accepts pull requests from `dev`.
+- Merging into either branch deploys the website automatically through GitHub Actions. See [docs/infra/gcp.md](docs/infra/gcp.md).
+
+## Deploy the website by hand
 
 The site runs as a container on Cloud Run (`web`, asia-south1). Firebase Hosting rewrites every path on 001.sreenivasgurram.com to it, and waitlist sign-ups go to Firestore (asia-south1).
 
