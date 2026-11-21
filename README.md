@@ -38,6 +38,7 @@ npm test
 - `dev` is the default branch and the dev site: https://dev.001.sreenivasgurram.com
 - `main` is production and only accepts pull requests from `dev`.
 - Merging into either branch deploys the website automatically through GitHub Actions. See [docs/infra/gcp.md](docs/infra/gcp.md).
+- Every prod release bumps the version (`MAJOR.MINOR.PATCH`) and adds notes to [CHANGELOG.md](CHANGELOG.md); a GitHub Release is published automatically. See [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Deploy the website by hand
 
