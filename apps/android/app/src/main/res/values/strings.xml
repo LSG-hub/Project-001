@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">001</string>
+
+    <!-- Navigation -->
+    <string name="nav_calls">Calls</string>
+    <string name="nav_family">Family</string>
+    <string name="nav_assistant">Assistant</string>
+    <string name="nav_you">You</string>
+    <string name="back">Back</string>
+    <string name="search">Search</string>
+    <string name="more_options">More options</string>
+
+    <!-- Calls -->
+    <string name="calls_title">Calls</string>
+    <string name="live_banner_title">Your assistant is on a call</string>
+    <string name="live_banner_open">Open</string>
+    <string name="filter_all">All</string>
+    <string name="filter_put_through">Put through</string>
+    <string name="filter_messages">Messages</string>
+    <string name="filter_spam">Spam</string>
+    <string name="section_today">Today</string>
+    <string name="section_yesterday">Yesterday</string>
+    <string name="outcome_put_through">Put through</string>
+    <string name="outcome_handled">Handled for you</string>
+    <string name="outcome_spam">Spam declined</string>
+    <string name="outcome_needs_reply">Needs your reply</string>
+    <string name="outcome_scam">Scam stopped</string>
+    <string name="select_a_call">Select a call to see its summary</string>
+
+    <!-- Live screening -->
+    <string name="live_status">Assistant is talking</string>
+    <string name="unknown_number">Unknown number</string>
+    <string name="live_said_by_assistant">You, said by assistant</string>
+    <string name="live_type_reply">Type a reply, it’ll say it</string>
+    <string name="live_send">Send reply</string>
+    <string name="live_decline">Decline</string>
+    <string name="live_pick_up">Pick up</string>
+
+    <!-- Summary -->
+    <string name="summary_heading">Summary</string>
+    <string name="summary_language">Language</string>
+    <string name="summary_length">Length</string>
+    <string name="summary_call_back">Call back</string>
+    <string name="summary_remind">Remind me</string>
+    <string name="summary_transcript">Transcript</string>
+    <string name="summary_kept">Transcript kept 30 days</string>
+    <string name="summary_delete">Delete this call</string>
+
+    <!-- Family -->
+    <string name="family_title">Family</string>
+    <string name="family_call_now">Call %1$s now</string>
+    <string name="family_report">Report to 1930</string>
+    <string name="family_protected">Protected</string>
+    <string name="family_calls_today">calls today</string>
+    <string name="family_put_through">put through</string>
+    <string name="family_scams">scam stopped</string>
+    <string name="family_add">Protect someone’s phone</string>
+
+    <!-- Assistant -->
+    <string name="assistant_title">Assistant</string>
+    <string name="assistant_subtitle">Ask about your calls, or get something done.</string>
+    <string name="assistant_hint">Ask anything</string>
+    <string name="assistant_talk">Talk to your assistant</string>
+
+    <!-- You -->
+    <string name="you_title">You</string>
+    <string name="you_plan">Assistant plan · %1$d of %2$d minutes left</string>
+    <string name="you_all_working">Everything is working</string>
+    <string name="you_all_working_detail">Forwarding, screening, alerts · 1 tip</string>
+    <string name="you_check">Check</string>
+    <string name="you_language">Language</string>
+    <string name="you_app_language">App language</string>
+    <string name="you_assistant_speaks">Assistant speaks</string>
+    <string name="you_each_callers_language">Each caller’s language</string>
+    <string name="you_your_assistant">Your assistant</string>
+    <string name="you_quick_answers">Quick answers</string>
+    <string name="you_quick_answers_value">3 saved</string>
+    <string name="you_ring_through">Always ring through</string>
+    <string name="you_ring_through_value">Contacts</string>
+    <string name="you_simple_mode">Simple mode</string>
+    <string name="you_simple_mode_detail">Bigger text, fewer buttons</string>
+    <string name="you_privacy">Privacy</string>
+    <string name="you_keep">Keep</string>
+    <string name="you_keep_value">Summaries, 30 days</string>
+    <string name="you_delete_all">Delete all my call data</string>
+
+    <!-- Language -->
+    <string name="language_title">Language</string>
+    <string name="language_search">Search in any language</string>
+    <string name="language_use_phone">Use phone’s language</string>
+    <string name="language_no_match">No language matches “%1$s”.</string>
+    <string name="language_voice_heading">Assistant speaks with callers in</string>
+    <string name="language_voice_match">Each caller’s language</string>
+    <string name="language_voice_match_detail">Recommended. It switches mid-call if they do.</string>
+    <string name="language_voice_fixed">Always my app language</string>
+    <string name="language_voice_fixed_detail">Same as your app language.</string>
+    <string name="language_summaries_note">Call summaries are always written in your app language.</string>
+
+    <!-- Sign in (mobile number only) -->
+    <string name="signin_title">Your assistant starts with your number</string>
+    <string name="signin_body">Sign in with your mobile number. It’s the number your assistant will protect. You can add an email later.</string>
+    <string name="signin_country_button">Country: %1$s, %2$s</string>
+    <string name="signin_country_change">Change country</string>
+    <string name="signin_number_invalid">That doesn’t look like a mobile number in %1$s.</string>
+    <string name="country_picker_title">Choose your country</string>
+    <string name="country_search">Search by country or code</string>
+    <string name="country_suggested">Suggested</string>
+    <string name="country_all">All countries</string>
+    <string name="country_none">No country matches that.</string>
+    <string name="signin_number">Mobile number</string>
+    <string name="signin_continue">Continue</string>
+    <string name="signin_code_title">Enter the 6-digit code</string>
+    <string name="signin_code_body">We sent it by SMS to %1$s.</string>
+    <string name="signin_code">Code</string>
+    <string name="signin_verify">Verify</string>
+    <string name="signin_change_number">Change number</string>
+    <string name="verify_title">Let’s check it’s your phone</string>
+    <string name="verify_body">We’ll ring %1$s once and hang up straight away. You don’t need to answer. Your phone barely rings.</string>
+    <string name="verify_role_title">First, allow call screening</string>
+    <string name="verify_role_body">Your assistant needs this to see incoming calls. It also lets us catch our verification call.</string>
+    <string name="verify_role_button">Allow call screening</string>
+    <string name="verify_call_me">Ring my phone</string>
+    <string name="verify_waiting">Ringing %1$s…</string>
+    <string name="verify_seconds_left">%1$d s</string>
+    <string name="verify_done">Verified. This phone has your SIM.</string>
+    <string name="verify_timed_out">We didn’t catch the call. Check your signal, or get a code read out instead.</string>
+    <string name="verify_try_again">Try again</string>
+    <string name="verify_voice_code">Get a voice code instead</string>
+    <string name="code_label">6-digit code</string>
+    <string name="code_wrong">That code didn’t match. Try again.</string>
+    <string name="voice_code_test_hint">Dev build: any 6 digits sign you in (the phone line isn\'t connected yet).</string>
+    <string name="voice_code_title">Enter the code we read out</string>
+    <string name="voice_code_body">We’re calling %1$s. Answer and you’ll hear a 6-digit code.</string>
+    <string name="signin_terms">By continuing you agree to the Terms and Privacy Policy.</string>
+
+    <!-- Setup -->
+    <string name="setup_step">Step %1$d of %2$d</string>
+    <string name="setup_title">Send unanswered calls to your assistant</string>
+    <string name="setup_body">We found your network: %1$s. Turning on forwarding takes one tap. Your number stays the same, and you can switch it off any time.</string>
+    <string name="setup_signed_in">Signed in</string>
+    <string name="setup_screening">Allowed to screen unknown callers</string>
+    <string name="setup_forwarding">Turn on call forwarding</string>
+    <string name="setup_forwarding_detail">Only for calls you don’t answer, decline, or that come while you’re busy. Your contacts still ring normally.</string>
+    <string name="setup_test">Test it with a call from us</string>
+    <string name="setup_turn_on">Turn on forwarding</string>
+    <string name="setup_myself">I’ll do it myself</string>
+    <string name="setup_done">Forwarding is on. We’ll test it with a call now.</string>
+
+    <!-- Connected app (backend) -->
+    <string name="calls_subtitle">Calls your assistant answered for you.</string>
+    <string name="calls_refresh">Refresh</string>
+    <string name="calls_test_title">Try your assistant</string>
+    <string name="calls_test_body">Call it from this phone and talk like a caller would. It\'s saved here with a summary.</string>
+    <string name="calls_test_button">Make a test call</string>
+    <string name="calls_empty_title">No calls yet</string>
+    <string name="calls_empty_body">When your assistant answers a call, it shows up here with a summary. Make a test call to see how it works.</string>
+    <string name="calls_error_title">Couldn\'t load your calls</string>
+    <string name="calls_retry">Try again</string>
+    <string name="call_unknown_caller">Unknown caller</string>
+    <string name="call_yesterday">Yesterday</string>
+    <string name="call_scam_risk">Scam risk: %1$s</string>
+    <string name="call_duration">%1$d s</string>
+    <string name="call_voice">Voice: %1$s</string>
+    <string name="call_no_summary">No summary for this call.</string>
+    <string name="call_caller_purpose">Caller: %1$s · Purpose: %2$s</string>
+    <string name="call_not_given">didn\'t say</string>
+    <string name="call_warning_signs">Warning signs</string>
+    <string name="call_to_do">To do</string>
+    <string name="call_transcript">Transcript</string>
+    <string name="call_assistant">Assistant</string>
+    <string name="call_caller">Caller</string>
+    <string name="call_cut_off">cut off</string>
+    <string name="category_scam">Scam</string>
+    <string name="category_spam">Spam</string>
+    <string name="category_sales">Sales</string>
+    <string name="category_delivery">Delivery</string>
+    <string name="category_personal">Personal</string>
+    <string name="category_work">Work</string>
+    <string name="category_service">Service</string>
+    <string name="category_other">Other</string>
+    <string name="category_no_summary">No summary</string>
+    <string name="risk_high">high</string>
+    <string name="risk_medium">medium</string>
+    <string name="risk_low">low</string>
+    <string name="risk_none">none</string>
+    <string name="test_title">Test call</string>
+    <string name="test_intro">You play the caller. Your assistant answers with your voice choice and what it knows about you. Hold the phone like a call, or use the speaker.</string>
+    <string name="test_caller_number">Call as number (optional)</string>
+    <string name="test_caller_number_hint">Calls from the same number share memory</string>
+    <string name="test_start">Start test call</string>
+    <string name="test_mic_needed">The test call needs the microphone. Allow it in Settings to try again.</string>
+    <string name="test_connecting">Connecting to your assistant…</string>
+    <string name="test_live">On a call with your assistant</string>
+    <string name="test_ending">Call ended</string>
+    <string name="test_speaker">Speaker</string>
+    <string name="test_hang_up">Hang up</string>
+    <string name="test_writing_summary">Writing the summary…</string>
+    <string name="test_again">Call again</string>
+    <string name="test_done">Done</string>
+    <string name="you_about">About you</string>
+    <string name="you_about_empty">Not set</string>
+    <string name="you_voice">Voice</string>
+    <string name="you_voice_default">%1$s (default)</string>
+    <string name="you_expected">Calls you\'re expecting</string>
+    <string name="you_expected_none">None</string>
+    <string name="you_expected_count">%1$d waiting</string>
+    <string name="you_app">App</string>
+    <string name="you_check_setup">Check setup</string>
+    <string name="you_check_setup_value">Permissions and call screening</string>
+    <string name="you_sign_out">Sign out</string>
+    <string name="about_intro">Tell your assistant about you, in your own words. It follows these on every call: what may be shared, how to handle deliveries, who to put through.</string>
+    <string name="about_name">Your name</string>
+    <string name="about_placeholder">e.g. I speak Telugu, Kannada, Hindi and English. Deliveries can be left with security. Never share my address.</string>
+    <string name="about_save">Save</string>
+    <string name="about_saved">Saved. Your next call uses it.</string>
+    <string name="voice_intro">How your assistant sounds to callers. It speaks each caller\'s language.</string>
+    <string name="voice_women">Women</string>
+    <string name="voice_men">Men</string>
+    <string name="voice_style_default">%1$s · default</string>
+    <string name="voice_try_hint">Make a test call from the Calls tab to hear it.</string>
+    <string name="expected_intro">Expecting a call? Tell your assistant what to do when it comes. The note clears itself once the call happens.</string>
+    <string name="expected_new">Who\'s calling, and what should it do?</string>
+    <string name="expected_placeholder">e.g. HR from Zoho: take their name and a good time to call back</string>
+    <string name="expected_today">Today</string>
+    <string name="expected_two_days">2 days</string>
+    <string name="expected_week">A week</string>
+    <string name="expected_add">Add</string>
+    <string name="expected_waiting">Waiting for these calls</string>
+    <string name="expected_until">Until %1$s</string>
+    <string name="expected_remove">Remove</string>
+    <string name="family_soon_title">Family protection is coming</string>
+    <string name="family_soon_body">Protect your parents\' phones, even basic keypad phones, and get alerts when a scammer calls them. It\'s being built next.</string>
+    <string name="assistant_soon_title">Talking to your assistant is coming</string>
+    <string name="assistant_soon_body">Soon you\'ll ask it to do things for you, or tell it who you\'re expecting. For now, add expected calls from the You tab.</string>
+    <string name="signin_checking">Checking…</string>
+    <string name="signin_not_set_up">Sign-in isn\'t switched on for this app yet. Try again in a few minutes.</string>
+    <string name="signin_call_again">Call me again</string>
+</resources>

@@ -65,3 +65,18 @@ keystore.properties
 # Local waitlist data (dev only)
 apps/web/.data/
 .next/
+
+# Android
+.gradle/
+.kotlin/
+apps/android/local.properties
+*.apk
+*.aab
+
+# Python tooling
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.import_linter_cache/
+services/api/recordings/
