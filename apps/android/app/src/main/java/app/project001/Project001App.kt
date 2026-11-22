@@ -2,6 +2,7 @@ package app.project001
 
 import android.app.Application
 import android.content.Context
+import app.project001.data.AppSettings
 import app.project001.data.CallsRepository
 import app.project001.data.ProfileRepository
 import app.project001.data.SignInRepository
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit
 
 /** The app's objects, created once. Screens get them from [graph]. */
 class AppGraph(context: Context) {
+    val settings = AppSettings(context)
     val auth = AuthRepository(context)
     private val http = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)

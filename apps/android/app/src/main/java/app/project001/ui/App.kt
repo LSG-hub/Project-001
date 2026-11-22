@@ -77,8 +77,9 @@ private val tabs = listOf(
  */
 @Composable
 fun App() {
-    val signedIn by LocalContext.current.graph.auth.signedIn.collectAsState()
-    var simpleMode by rememberSaveable { mutableStateOf(false) }
+    val graph = LocalContext.current.graph
+    val signedIn by graph.auth.signedIn.collectAsState()
+    val simpleMode by graph.settings.simpleMode.collectAsState()
     val base = LocalDensity.current
     CompositionLocalProvider(LocalDensity provides Density(base.density, base.fontScale * if (simpleMode) 1.2f else 1f)) {
         if (!signedIn) {
@@ -86,13 +87,13 @@ fun App() {
                 SignInScreen()
             }
         } else {
-            Shell(simpleMode = simpleMode, onSimpleModeChange = { simpleMode = it })
+            Shell()
         }
     }
 }
 
 @Composable
-private fun Shell(simpleMode: Boolean, onSimpleModeChange: (Boolean) -> Unit) {
+private fun Shell() {
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route ?: "calls"
@@ -102,14 +103,14 @@ private fun Shell(simpleMode: Boolean, onSimpleModeChange: (Boolean) -> Unit) {
         if (wide) {
             Row(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                 if (onTab) Rail(route) { go(nav, it) }
-                Box(Modifier.weight(1f)) { Routes(nav, simpleMode, onSimpleModeChange) }
+                Box(Modifier.weight(1f)) { Routes(nav) }
             }
         } else {
             Scaffold(
                 containerColor = AppTheme.colors.paper,
                 bottomBar = { if (onTab) BottomBar(route) { go(nav, it) } },
             ) { padding ->
-                Box(Modifier.padding(padding)) { Routes(nav, simpleMode, onSimpleModeChange) }
+                Box(Modifier.padding(padding)) { Routes(nav) }
             }
         }
     }
@@ -168,7 +169,7 @@ private fun Rail(current: String, onSelect: (String) -> Unit) {
 }
 
 @Composable
-private fun Routes(nav: NavHostController, simpleMode: Boolean, onSimpleModeChange: (Boolean) -> Unit) {
+private fun Routes(nav: NavHostController) {
     val context = LocalContext.current
     var languageTag by rememberSaveable { mutableStateOf(currentAppLanguage(context)) }
     NavHost(nav, startDestination = "calls") {
@@ -182,8 +183,6 @@ private fun Routes(nav: NavHostController, simpleMode: Boolean, onSimpleModeChan
                 ?: stringResource(R.string.language_use_phone)
             YouScreen(
                 appLanguageLabel = label,
-                simpleMode = simpleMode,
-                onSimpleModeChange = onSimpleModeChange,
                 onOpenLanguage = { nav.navigate("language") },
                 onOpenSetup = { nav.navigate("setup") },
                 onOpenAbout = { nav.navigate("about") },
