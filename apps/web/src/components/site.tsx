@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { LogoMark } from '@/components/logo-mark'
 import { CONTACT_EMAIL } from '@/lib/content'
 
 export { CONTACT_EMAIL }
@@ -10,13 +11,7 @@ export function Logo() {
       href="/"
       className="flex items-center gap-2.5 font-display text-xl font-semibold tracking-tight"
     >
-      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-        <rect width="28" height="28" rx="9" fill="#111312" />
-        <path
-          d="M9.5 9.5h3l1.2 3-1.6 1a6.5 6.5 0 0 0 2.9 2.9l1-1.6 3 1.2v3A1.5 1.5 0 0 1 17.5 20 9 9 0 0 1 8 11a1.5 1.5 0 0 1 1.5-1.5"
-          fill="#7BE0B0"
-        />
-      </svg>
+      <LogoMark />
       Project 001
     </Link>
   )

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The full logo tile for in-app use (sign-in); no launcher crop, so the mark is drawn larger. Generated with brand/app/logo-headset.svg; keep them in step. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#DDF3E6" android:pathData="M24,0H84A24,24 0 0 1 108,24V84A24,24 0 0 1 84,108H24A24,24 0 0 1 0,84V24A24,24 0 0 1 24,0Z" />
+    <group android:pivotX="54" android:pivotY="54" android:scaleX="1.4" android:scaleY="1.4">
+        <group android:translateY="-5">
+            <path android:strokeColor="#0A7A53" android:strokeWidth="5.5" android:strokeLineCap="round" android:pathData="M36,57A18,18 0 0 1 72,57" />
+            <path android:fillColor="#0A7A53" android:pathData="M35.0,52H35.5A5.5,5.5 0 0 1 41.0,57.5V63.5A5.5,5.5 0 0 1 35.5,69H35.0A5.5,5.5 0 0 1 29.5,63.5V57.5A5.5,5.5 0 0 1 35.0,52Z" />
+            <path android:fillColor="#0A7A53" android:pathData="M72.5,52H73.0A5.5,5.5 0 0 1 78.5,57.5V63.5A5.5,5.5 0 0 1 73.0,69H72.5A5.5,5.5 0 0 1 67,63.5V57.5A5.5,5.5 0 0 1 72.5,52Z" />
+            <path android:strokeColor="#0A7A53" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M35.25,68C35.25,77 40,79.5 47,79.5" />
+            <path android:fillColor="#0A7A53" android:pathData="M46.7,79.5a3.8,3.8 0 1,0 7.6,0a3.8,3.8 0 1,0 -7.6,0Z" />
+            <path android:strokeColor="#0A7A53" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M48,57.0V64.0" />
+            <path android:strokeColor="#0A7A53" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M54,54.0V67.0" />
+            <path android:strokeColor="#0A7A53" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M60,57.0V64.0" />
+        </group>
+    </group>
+</vector>

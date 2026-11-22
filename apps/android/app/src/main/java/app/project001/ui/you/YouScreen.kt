@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.project001.R
+import app.project001.data.ThemeChoice
 import app.project001.data.api.Me
 import app.project001.data.api.Profile
 import app.project001.graph
@@ -56,8 +59,6 @@ import app.project001.ui.theme.DisplayFamily
 @Composable
 fun YouScreen(
     appLanguageLabel: String,
-    simpleMode: Boolean,
-    onSimpleModeChange: (Boolean) -> Unit,
     onOpenLanguage: () -> Unit,
     onOpenSetup: () -> Unit,
     onOpenAbout: () -> Unit,
@@ -70,6 +71,8 @@ fun YouScreen(
     var profile by remember { mutableStateOf<Profile?>(null) }
     var expectedCount by remember { mutableStateOf<Int?>(null) }
     var defaultVoice by remember { mutableStateOf<String?>(null) }
+    val simpleMode by graph.settings.simpleMode.collectAsState()
+    val theme by graph.settings.theme.collectAsState()
     val scope = rememberCoroutineScope()
     LifecycleResumeEffect(Unit) {
         val job = scope.launchCatching {
@@ -119,8 +122,21 @@ fun YouScreen(
                     SectionLabel(stringResource(R.string.you_app), Modifier.padding(top = 14.dp, bottom = 2.dp))
                     NavRow(stringResource(R.string.you_app_language), appLanguageLabel, onOpenLanguage)
                     NavRow(stringResource(R.string.you_check_setup), stringResource(R.string.you_check_setup_value), onOpenSetup)
+                    Column(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
+                        Text(stringResource(R.string.you_theme), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal))
+                        Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf(
+                                ThemeChoice.Light to R.string.theme_light,
+                                ThemeChoice.Dark to R.string.theme_dark,
+                                ThemeChoice.System to R.string.theme_system,
+                            ).forEach { (choice, label) ->
+                                FilterChip(selected = theme == choice, onClick = { graph.settings.setTheme(choice) }, label = { Text(stringResource(label)) })
+                            }
+                        }
+                    }
+                    HorizontalDivider(color = c.line)
                     Row(
-                        Modifier.fillMaxWidth().heightIn(min = 64.dp).clickable(role = Role.Switch) { onSimpleModeChange(!simpleMode) },
+                        Modifier.fillMaxWidth().heightIn(min = 64.dp).clickable(role = Role.Switch) { graph.settings.setSimpleMode(!simpleMode) },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(Modifier.weight(1f)) {

@@ -1,9 +1,7 @@
 import { ImageResponse } from 'next/og'
+import { LogoMark } from '@/components/logo-mark'
 
 export const ogSize = { width: 1200, height: 630 }
-
-const phonePath =
-  'M9.5 9.5h3l1.2 3-1.6 1a6.5 6.5 0 0 0 2.9 2.9l1-1.6 3 1.2v3A1.5 1.5 0 0 1 17.5 20 9 9 0 0 1 8 11a1.5 1.5 0 0 1 1.5-1.5'
 
 /** Shared share-card design: paper background, big headline, call-green accent. */
 export function ogImage({
@@ -30,10 +28,7 @@ export function ogImage({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-        <svg width="56" height="56" viewBox="0 0 28 28" role="img" aria-label="Project 001 logo">
-          <rect width="28" height="28" rx="9" fill="#111312" />
-          <path d={phonePath} fill="#7BE0B0" />
-        </svg>
+        <LogoMark size={56} />
         <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5 }}>Project 001</div>
         <div
           style={{

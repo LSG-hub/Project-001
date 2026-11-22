@@ -2,6 +2,7 @@ package app.project001.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
@@ -46,21 +47,22 @@ data class AppColors(
     val onAccent: Color,
 )
 
+/** The website's palette (apps/web/src/app/globals.css), so the app and site match. */
 val LightAppColors = AppColors(
-    paper = Color(0xFFFAF8F3),
+    paper = Color(0xFFF7F7F4),
     card = Color(0xFFFFFFFF),
-    ink = Color(0xFF16181A),
-    muted = Color(0xFF5F6368),
-    line = Color(0xFFF1EEE7),
-    chipLine = Color(0xFFDAD6CC),
-    safe = Tone(Color(0xFF167443), Color(0xFFE3F1E8)),
+    ink = Color(0xFF111312),
+    muted = Color(0xFF5A605D),
+    line = Color(0xFFE2E3DE),
+    chipLine = Color(0xFFD9DBD5),
+    safe = Tone(Color(0xFF0A7A53), Color(0xFFDDF3E6)),
     info = Tone(Color(0xFF2F5FA8), Color(0xFFEEF2F9)),
-    caution = Tone(Color(0xFF9A5B00), Color(0xFFFBF0DC)),
-    scam = Tone(Color(0xFFA8331F), Color(0xFFFBE9E5)),
-    neutral = Tone(Color(0xFF5F6368), Color(0xFFF1EFEA)),
-    inverse = Color(0xFF16181A),
-    onInverse = Color(0xFFFFFFFF),
-    accent = Color(0xFF167443),
+    caution = Tone(Color(0xFF8A4A06), Color(0xFFFDF1DC)),
+    scam = Tone(Color(0xFFA11B12), Color(0xFFFDE8E6)),
+    neutral = Tone(Color(0xFF5A605D), Color(0xFFF1F2EE)),
+    inverse = Color(0xFF111312),
+    onInverse = Color(0xFFF7F7F4),
+    accent = Color(0xFF0A7A53),
     onAccent = Color(0xFFFFFFFF),
 )
 
@@ -142,8 +144,9 @@ private val AppTypography = Typography(
 @Composable
 fun Project001Theme(dark: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (dark) DarkAppColors else LightAppColors
-    CompositionLocalProvider(LocalAppColors provides colors) {
-        MaterialTheme(colorScheme = colors.toScheme(dark), typography = AppTypography, content = content)
+    MaterialTheme(colorScheme = colors.toScheme(dark), typography = AppTypography) {
+        // Text without its own colour uses LocalContentColor, which is black unless set here.
+        CompositionLocalProvider(LocalAppColors provides colors, LocalContentColor provides colors.ink, content = content)
     }
 }
 

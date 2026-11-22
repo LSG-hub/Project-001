@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="paper">#FAF8F3</color>
-    <color name="ink">#16181A</color>
+    <!-- The website's palette (apps/web/src/app/globals.css), so app and site look like one product. -->
+    <color name="paper">#F7F7F4</color>
+    <color name="ink">#111312</color>
     <color name="mint">#7BE0B0</color>
+    <color name="logo_mint">#DDF3E6</color>
 </resources>

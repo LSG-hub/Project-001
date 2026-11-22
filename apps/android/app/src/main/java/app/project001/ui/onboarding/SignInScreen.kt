@@ -4,6 +4,7 @@ import android.app.role.RoleManager
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
@@ -111,9 +113,7 @@ fun SignInScreen() {
 
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).widthIn(max = 520.dp)) {
         Spacer(Modifier.height(48.dp))
-        Box(Modifier.size(52.dp).clip(RoundedCornerShape(16.dp)).background(c.inverse), contentAlignment = Alignment.Center) {
-            Icon(Icons.Filled.Call, contentDescription = null, tint = Color(0xFF7BE0B0), modifier = Modifier.size(26.dp))
-        }
+        Image(painterResource(R.drawable.logo_mark), contentDescription = null, modifier = Modifier.size(64.dp))
         Spacer(Modifier.height(28.dp))
         when (step) {
             Step.Number -> NumberStep(region, number, busy, onRegion = { region = it }, onNumber = { number = it }, onContinue = ::startVerification)

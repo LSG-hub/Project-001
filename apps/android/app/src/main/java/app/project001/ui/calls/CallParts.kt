@@ -1,6 +1,7 @@
 package app.project001.ui.calls
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -117,6 +118,7 @@ fun Bubble(fromAssistant: Boolean, text: String, cutOff: Boolean = false, time: 
                 .fillMaxWidth(0.86f)
                 .clip(RoundedCornerShape(16.dp))
                 .background(if (fromAssistant) c.safe.tint else c.card)
+                .border(1.dp, if (fromAssistant) c.safe.tint else c.line, RoundedCornerShape(16.dp))
                 .padding(horizontal = 14.dp, vertical = 10.dp),
         ) {
             val who = stringResource(if (fromAssistant) R.string.call_assistant else R.string.call_caller)

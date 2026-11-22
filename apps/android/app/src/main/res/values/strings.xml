@@ -208,6 +208,10 @@
     <string name="you_app">App</string>
     <string name="you_check_setup">Check setup</string>
     <string name="you_check_setup_value">Permissions and call screening</string>
+    <string name="you_theme">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">Same as phone</string>
     <string name="you_sign_out">Sign out</string>
     <string name="about_intro">Tell your assistant about you, in your own words. It follows these on every call: what may be shared, how to handle deliveries, who to put through.</string>
     <string name="about_name">Your name</string>

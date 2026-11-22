@@ -1,6 +1,7 @@
 package app.project001.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,7 +62,7 @@ fun BackRow(onBack: () -> Unit, title: String? = null, trailing: @Composable Row
     }
 }
 
-/** White rounded card used for every group on the paper background. */
+/** White rounded card with a hairline border (as on the website), used for every group. */
 @Composable
 fun Panel(modifier: Modifier = Modifier, padding: Dp = 16.dp, content: @Composable ColumnScope.() -> Unit) {
     Column(
@@ -69,6 +70,7 @@ fun Panel(modifier: Modifier = Modifier, padding: Dp = 16.dp, content: @Composab
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(AppTheme.colors.card)
+            .border(1.dp, AppTheme.colors.line, RoundedCornerShape(20.dp))
             .padding(padding),
         content = content,
     )
