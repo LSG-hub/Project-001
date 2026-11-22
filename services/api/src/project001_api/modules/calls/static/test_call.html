@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>001 · Test call</title>
+<style>
+  :root {
+    --paper: #FAF8F3; --card: #FFFFFF; --ink: #16181A; --muted: #6B6F72; --line: #E7E2D8;
+    --green: #167443; --green-tint: #E3F1E8; --amber: #9A5B00; --amber-tint: #FBF0DC;
+    --brick: #A8331F; --brick-tint: #F8E4DF; --info: #2F5FA8; --info-tint: #E5ECF7;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121413; --card: #1B1E1C; --ink: #ECEDEA; --muted: #9BA09C; --line: #2C312E;
+      --green: #6BD69A; --green-tint: #1D3326; --amber: #F0B45C; --amber-tint: #33280F;
+      --brick: #F08C78; --brick-tint: #3A1E18; --info: #8FB3F0; --info-tint: #1C2638;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: baseline; gap: 12px; padding: 20px 24px 8px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+  header span { color: var(--muted); font-size: 14px; }
+  main { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; padding: 8px 24px 24px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; padding: 8px 16px 16px; } header { padding: 16px 16px 4px; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; min-width: 0; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  label.small { font-size: 13px; color: var(--muted); }
+  textarea { font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line);
+             border-radius: 10px; padding: 9px 12px; width: 100%; resize: vertical; }
+  #brief { font: 12px/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 340px; overflow: auto;
+           background: var(--paper); border-radius: 10px; padding: 10px; margin: 8px 0 0; }
+  .expect { display: flex; gap: 8px; align-items: flex-start; background: var(--paper); border-radius: 10px;
+            padding: 6px 10px; margin-top: 6px; font-size: 14px; }
+  .expect span { flex: 1; overflow-wrap: anywhere; }
+  .expect small { color: var(--muted); white-space: nowrap; }
+  .expect button { padding: 0 6px; background: transparent; color: var(--muted); font-weight: 400; }
+  select { font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line);
+           border-radius: 10px; padding: 8px 10px; max-width: 100%; }
+  input[type=text] { font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line);
+                     border-radius: 10px; padding: 9px 12px; min-width: 0; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 999px; padding: 10px 20px; cursor: pointer; }
+  button.primary { background: var(--green); color: var(--paper); }
+  button.danger { background: var(--brick); color: var(--paper); }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  button:disabled { opacity: .45; cursor: default; }
+  #status { font-size: 14px; color: var(--muted); }
+  #level { width: 90px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  #level > div { height: 100%; width: 0; background: var(--green); transition: width .08s; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+  #transcript { display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+  .bubble { max-width: 85%; padding: 9px 13px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .bubble.assistant { background: var(--green-tint); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .bubble.caller { background: var(--paper); border: 1px solid var(--line); align-self: flex-end; border-bottom-right-radius: 4px; }
+  .bubble .who { display: block; font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .bubble.cut::after { content: " — cut off"; color: var(--muted); font-size: 12px; }
+  .note { align-self: center; font-size: 13px; color: var(--muted); background: var(--info-tint); padding: 4px 12px; border-radius: 999px; }
+  .empty { color: var(--muted); font-size: 14px; }
+  #summary { display: none; border-radius: 14px; padding: 14px 16px; margin-top: 12px; background: var(--paper); border: 1px solid var(--line); }
+  #summary .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--info-tint); color: var(--info); }
+  .badge.high, .badge.scam { background: var(--brick-tint); color: var(--brick); }
+  .badge.medium { background: var(--amber-tint); color: var(--amber); }
+  .badge.none, .badge.low { background: var(--green-tint); color: var(--green); }
+  #summary p { margin: 4px 0; }
+  #summary ul { margin: 4px 0; padding-left: 20px; }
+  #stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat { background: var(--paper); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+  .stat b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
+  #log { font: 12px/1.45 var(--mono); max-height: 360px; overflow: auto; background: var(--paper);
+         border-radius: 10px; padding: 8px 10px; }
+  #log div { white-space: pre-wrap; overflow-wrap: anywhere; }
+  #log .t { color: var(--muted); }
+  #log .k-tool_call, #log .k-interrupted, #log .k-error { color: var(--brick); }
+  #log .k-turn_complete, #log .k-call_started, #log .k-call_ended { color: var(--green); }
+  #calls { display: flex; flex-direction: column; gap: 6px; }
+  #calls button { text-align: left; font-weight: 400; border-radius: 10px; padding: 8px 10px; background: var(--paper);
+                  border: 1px solid var(--line); color: var(--ink); }
+  #calls small { color: var(--muted); }
+  details { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  details code { font: 12px var(--mono); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Test call</h1>
+  <span>Call the assistant from your browser. Use headphones, so it doesn't hear itself.</span>
+</header>
+<main>
+  <section class="card">
+    <div class="row">
+      <label class="small" for="owner">Assistant answers for</label>
+      <input id="owner" type="text" placeholder="Your name" maxlength="40" style="width: 160px">
+      <label class="small" for="caller">Caller number</label>
+      <input id="caller" type="text" placeholder="withheld" maxlength="20" style="width: 150px" title="Calls from the same number share memory">
+      <label class="small"><input id="useMic" type="checkbox" checked> Microphone</label>
+    </div>
+    <div class="row" style="margin-top: 10px">
+      <label class="small" for="voice">Voice</label>
+      <select id="voice"><option value="">Default</option></select>
+      <select id="lang" title="Language of the sample script"></select>
+      <button class="ghost" id="preview" type="button" title="Hear this voice read the sample script">▶ Preview</button>
+      <span id="voiceNote" class="small" style="color: var(--muted)"></span>
+    </div>
+    <details id="scriptBox" style="margin-top: 8px">
+      <summary>Sample script (every voice reads the same words)</summary>
+      <p id="script" style="color: var(--ink); line-height: 1.6"></p>
+    </details>
+    <div class="row" style="margin-top: 12px">
+      <button id="start" class="primary">Start call</button>
+      <button id="end" class="danger" disabled>Hang up</button>
+      <div id="level" title="Microphone level"><div></div></div>
+      <span id="status">Ready.</span>
+    </div>
+    <form id="typeForm" class="row" style="margin-top: 12px">
+      <input id="typed" type="text" placeholder="Or type what the caller says…" style="flex: 1" disabled>
+      <button class="ghost" id="send" disabled>Send</button>
+    </form>
+
+    <div id="summary"></div>
+    <h2>Transcript</h2>
+    <div id="transcript"><p class="empty">Start a call and say hello. The assistant speaks first.</p></div>
+  </section>
+
+  <aside class="card">
+    <h2 style="margin-top: 0">What the assistant knows</h2>
+    <label class="small" for="about">About you (your words are instructions)</label>
+    <textarea id="about" rows="4" maxlength="2000" placeholder="e.g. I'm an AI engineer in Bengaluru. I speak Telugu, Kannada, Hindi, English. Deliveries can be left with security. Never share my address."></textarea>
+    <div class="row" style="margin-top: 6px"><button class="ghost" id="saveAbout" type="button">Save</button><span id="aboutNote" class="small" style="color: var(--muted)"></span></div>
+    <label class="small" style="display: block; margin-top: 12px">Calls you're expecting</label>
+    <div id="expected"></div>
+    <form id="expectForm" class="row" style="margin-top: 6px">
+      <input id="expectText" type="text" placeholder="e.g. HR from Zoho: take their number, I'll call back" style="flex: 1" maxlength="500">
+      <select id="expectHours"><option value="12">today</option><option value="48">2 days</option><option value="168">a week</option></select>
+      <button class="ghost" type="submit">Add</button>
+    </form>
+    <details id="briefBox" open style="margin-top: 12px">
+      <summary>Sent to Gemini at call start (for this caller number)</summary>
+      <pre id="brief"></pre>
+    </details>
+
+    <h2>What's streaming</h2>
+    <div id="stats">
+      <div class="stat">You → assistant<b id="upStat">0 KB</b><span id="upChunks">0 chunks · 16 kHz</span></div>
+      <div class="stat">Assistant → you<b id="downStat">0 KB</b><span id="downChunks">0 chunks · 24 kHz</span></div>
+    </div>
+    <h2>Events</h2>
+    <div id="log"><div class="t">Events from the server appear here.</div></div>
+    <details>
+      <summary>How this works</summary>
+      <p>Your mic audio goes to the API as 16 kHz PCM over a WebSocket (<code>/v1/calls/test</code>). The API streams it
+      to Gemini Live on Vertex AI and sends back the assistant's voice (24 kHz PCM) plus events: transcript fragments for
+      both sides, <code>interrupted</code> when you talk over it, <code>turn_complete</code>, and <code>tool_call</code>
+      when it uses a function like <code>end_call</code>. When the call ends, Gemini writes the summary from the transcript.</p>
+    </details>
+    <h2>Recent calls</h2>
+    <div id="calls"><p class="empty">None yet.</p></div>
+  </aside>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const WORKLET = `
+class Pcm16 extends AudioWorkletProcessor {
+  constructor() { super(); this.buf = new Int16Array(640); this.n = 0; }  // 40 ms at 16 kHz
+  process(inputs) {
+    const ch = inputs[0][0];
+    if (!ch) return true;
+    for (let i = 0; i < ch.length; i++) {
+      const s = Math.max(-1, Math.min(1, ch[i]));
+      this.buf[this.n++] = s < 0 ? s * 0x8000 : s * 0x7fff;
+      if (this.n === this.buf.length) { this.port.postMessage(this.buf.buffer.slice(0)); this.n = 0; }
+    }
+    return true;
+  }
+}
+registerProcessor("pcm16", Pcm16);`;
+
+let ws = null, micStream = null, micCtx = null, playCtx = null, nextTime = 0;
+const playing = new Set();
+const stats = { up: 0, upChunks: 0, down: 0, downChunks: 0 };
+let open = null;  // the bubble being written: {speaker, el}
+const t0 = { at: 0 };
+
+try { $("#owner").value = localStorage.getItem("owner") || ""; } catch {}
+
+try { $("#caller").value = localStorage.getItem("caller") || ""; } catch {}
+
+// --- What the assistant knows: profile, expected calls, and the exact brief ---
+const api = (path, opts = {}) =>
+  fetch(path, { headers: { "content-type": "application/json" }, ...opts });
+
+async function loadProfile() {
+  const res = await api("/v1/context/profile");
+  if (!res.ok) return;
+  const p = await res.json();
+  $("#about").value = p.about || "";
+  if (p.name) $("#owner").value = p.name;
+}
+async function saveProfile() {
+  const res = await api("/v1/context/profile", {
+    method: "PUT", body: JSON.stringify({ name: $("#owner").value.trim() || null, about: $("#about").value }),
+  });
+  $("#aboutNote").textContent = res.ok ? "Saved." : "Couldn't save.";
+  setTimeout(() => ($("#aboutNote").textContent = ""), 2000);
+  loadBrief();
+}
+async function loadExpected() {
+  const res = await api("/v1/context/expected");
+  if (!res.ok) return;
+  const box = $("#expected");
+  box.innerHTML = "";
+  const items = await res.json();
+  if (!items.length) box.innerHTML = `<p class="empty" style="margin: 4px 0">None.</p>`;
+  for (const e of items) {
+    const row = document.createElement("div"); row.className = "expect";
+    const until = new Date(e.expires_at).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" });
+    row.innerHTML = `<span></span><small>until ${until}</small><button title="Remove" type="button">×</button>`;
+    row.querySelector("span").textContent = e.text;
+    row.querySelector("button").onclick = async () => {
+      await api(`/v1/context/expected/${e.id}`, { method: "DELETE" }); loadExpected(); loadBrief();
+    };
+    box.append(row);
+  }
+}
+async function addExpected(ev) {
+  ev.preventDefault();
+  const text = $("#expectText").value.trim();
+  if (!text) return;
+  await api("/v1/context/expected", { method: "POST", body: JSON.stringify({ text, hours: Number($("#expectHours").value) }) });
+  $("#expectText").value = "";
+  loadExpected(); loadBrief();
+}
+async function loadBrief() {
+  const caller = $("#caller").value.trim();
+  const res = await api(`/v1/calls/context${caller ? "?caller=" + encodeURIComponent(caller) : ""}`);
+  const body = await res.json();
+  $("#brief").textContent = res.ok
+    ? `${body.instructions}\nTools: ${body.tools.join(", ")}`
+    : `Can't build the brief: ${body.error?.message || res.status}`;
+}
+
+// The original eight Live voices: the ones Google's own samples use most.
+const ORIGINAL = ["Kore", "Aoede", "Leda", "Zephyr", "Puck", "Charon", "Fenrir", "Orus"];
+let voiceList = [];
+async function loadVoices() {
+  const res = await fetch("/v1/voices");
+  if (!res.ok) return;
+  voiceList = await res.json();
+  const select = $("#voice");
+  const group = (label, voices) => {
+    const g = document.createElement("optgroup"); g.label = label;
+    for (const v of voices) g.append(new Option(`${v.name} · ${v.style}`, v.name));
+    select.append(g);
+  };
+  const byName = Object.fromEntries(voiceList.map((v) => [v.name, v]));
+  const fallback = voiceList.find((v) => v.default);
+  if (fallback) select.options[0].textContent = `Default · ${fallback.name} (${fallback.style})`;
+  group("Original 8 (most used)", ORIGINAL.map((n) => byName[n]).filter(Boolean)
+    .map((v) => ({ ...v, style: `${v.style}, ${v.gender === "female" ? "woman" : "man"}` })));
+  group("Women", voiceList.filter((v) => v.gender === "female"));
+  group("Men", voiceList.filter((v) => v.gender === "male"));
+  try { select.value = localStorage.getItem("voice") || ""; } catch {}
+}
+let previewAudio = null;
+const chosenVoice = () => $("#voice").value || voiceList.find((v) => v.default)?.name || "";
+function sampleQuery() {
+  const q = new URLSearchParams({ lang: $("#lang").value || "en" });
+  const o = $("#owner").value.trim();
+  if (o) q.set("owner", o);
+  if (chosenVoice()) q.set("voice", chosenVoice());
+  return "?" + q;
+}
+async function loadLanguages() {
+  const res = await fetch("/v1/voices/sample-languages");
+  if (!res.ok) return;
+  for (const l of await res.json()) $("#lang").append(new Option(l.label, l.code));
+  try { $("#lang").value = localStorage.getItem("lang") || "en"; } catch {}
+}
+async function loadScript() {
+  const res = await fetch(`/v1/voices/sample-script${sampleQuery()}`);
+  if (res.ok) $("#script").textContent = (await res.json()).script;
+}
+async function preview() {
+  const name = chosenVoice();
+  if (!name) { $("#voiceNote").textContent = "Pick a voice first."; return; }
+  if (previewAudio && !previewAudio.paused) { previewAudio.pause(); $("#preview").textContent = "▶ Preview"; return; }
+  const started = performance.now();
+  const slow = setTimeout(() => {
+    $("#voiceNote").textContent = `Recording ${name} for the first time (about 30 s)…`;
+  }, 800);
+  $("#voiceNote").textContent = `Getting ${name}…`;
+  const res = await fetch(`/v1/voices/${name}/sample${sampleQuery()}`);
+  clearTimeout(slow);
+  if (!res.ok) { $("#voiceNote").textContent = "Couldn't get a sample."; return; }
+  previewAudio = new Audio(URL.createObjectURL(await res.blob()));
+  previewAudio.onended = () => { $("#preview").textContent = "▶ Preview"; };
+  previewAudio.play();
+  $("#preview").textContent = "■ Stop";
+  const v = voiceList.find((x) => x.name === name);
+  $("#voiceNote").textContent =
+    `${name} · ${v?.style ?? ""} · ${v?.gender === "female" ? "woman" : "man"} · ${$("#lang").selectedOptions[0]?.text ?? ""}`;
+}
+
+function setStatus(text) { $("#status").textContent = text; }
+function kb(n) { return n < 1024 ? `${n} B` : `${(n / 1024).toFixed(1)} KB`; }
+function drawStats() {
+  $("#upStat").textContent = kb(stats.up); $("#upChunks").textContent = `${stats.upChunks} chunks · 16 kHz`;
+  $("#downStat").textContent = kb(stats.down); $("#downChunks").textContent = `${stats.downChunks} chunks · 24 kHz`;
+}
+function log(kind, detail) {
+  const box = $("#log");
+  if (box.firstChild?.classList?.contains("t") && box.children.length === 1) box.innerHTML = "";
+  const line = document.createElement("div");
+  line.className = `k-${kind}`;
+  const secs = t0.at ? ((performance.now() - t0.at) / 1000).toFixed(1).padStart(5) : "  0.0";
+  line.innerHTML = `<span class="t">${secs}s</span> ${kind}`;
+  if (detail) line.append(" " + detail);
+  box.append(line);
+  box.scrollTop = box.scrollHeight;
+}
+function clearTranscript() { $("#transcript").innerHTML = ""; open = null; }
+function bubble(speaker, text) {
+  const el = document.createElement("div");
+  el.className = `bubble ${speaker}`;
+  el.innerHTML = `<span class="who">${speaker === "caller" ? "Caller" : "Assistant"}</span>`;
+  el.append(document.createTextNode(text));
+  $("#transcript").append(el);
+  el.scrollIntoView({ block: "nearest" });
+  return el;
+}
+function fragment(speaker, text) {
+  if (!open || open.speaker !== speaker) open = { speaker, el: bubble(speaker, "") };
+  open.el.lastChild.textContent += text;
+}
+function note(text) {
+  const el = document.createElement("div"); el.className = "note"; el.textContent = text;
+  $("#transcript").append(el);
+}
+
+async function start() {
+  const owner = $("#owner").value.trim();
+  const voice = $("#voice").value;
+  try { localStorage.setItem("owner", owner); localStorage.setItem("voice", voice); } catch {}
+  previewAudio?.pause();
+  Object.assign(stats, { up: 0, upChunks: 0, down: 0, downChunks: 0 }); drawStats();
+  $("#log").innerHTML = ""; $("#summary").style.display = "none"; clearTranscript();
+  t0.at = performance.now();
+
+  playCtx = new AudioContext({ sampleRate: 24000 });
+  nextTime = 0;
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  const params = new URLSearchParams();
+  if (owner) params.set("owner", owner);
+  if (voice) params.set("voice", voice);
+  const caller = $("#caller").value.trim();
+  if (caller) params.set("caller", caller);
+  try { localStorage.setItem("caller", caller); } catch {}
+  ws = new WebSocket(`${proto}://${location.host}/v1/calls/test${params.size ? "?" + params : ""}`);
+  ws.binaryType = "arraybuffer";
+  ws.onmessage = (m) => typeof m.data === "string" ? onEvent(JSON.parse(m.data)) : onAudio(m.data);
+  ws.onopen = async () => {
+    setStatus("Connecting to the assistant…");
+    if ($("#useMic").checked) {
+      try { await startMic(); } catch (e) { setStatus(`Microphone unavailable (${e.message}). Type instead.`); }
+    }
+  };
+  ws.onclose = () => { stopMic(); setButtons(false); };
+  setButtons(true);
+}
+
+async function startMic() {
+  micStream = await navigator.mediaDevices.getUserMedia({
+    audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+  });
+  micCtx = new AudioContext({ sampleRate: 16000 });
+  await micCtx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" })));
+  const node = new AudioWorkletNode(micCtx, "pcm16");
+  node.port.onmessage = ({ data }) => {
+    if (ws?.readyState !== WebSocket.OPEN) return;
+    ws.send(data);
+    stats.up += data.byteLength; stats.upChunks++; drawStats();
+    const s = new Int16Array(data); let sum = 0;
+    for (let i = 0; i < s.length; i += 4) sum += (s[i] / 32768) ** 2;
+    $("#level > div").style.width = `${Math.min(100, Math.sqrt(sum / (s.length / 4)) * 400)}%`;
+  };
+  micCtx.createMediaStreamSource(micStream).connect(node);
+}
+
+function stopMic() {
+  micStream?.getTracks().forEach((t) => t.stop()); micStream = null;
+  micCtx?.close(); micCtx = null;
+  $("#level > div").style.width = "0";
+}
+
+function onAudio(buf) {
+  stats.down += buf.byteLength; stats.downChunks++; drawStats();
+  const pcm = new Int16Array(buf);
+  const audio = playCtx.createBuffer(1, pcm.length, 24000);
+  const ch = audio.getChannelData(0);
+  for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768;
+  const src = playCtx.createBufferSource();
+  src.buffer = audio; src.connect(playCtx.destination);
+  const at = Math.max(playCtx.currentTime + 0.03, nextTime);
+  src.start(at); nextTime = at + audio.duration;
+  playing.add(src); src.onended = () => playing.delete(src);
+}
+
+function stopPlayback() {
+  for (const src of playing) { try { src.stop(); } catch {} }
+  playing.clear(); nextTime = 0;
+}
+
+function onEvent(e) {
+  const { type, ...rest } = e;
+  const text = e.text ? JSON.stringify(e.text)
+    : e.name && e.args ? `${e.name} ${JSON.stringify(e.args)}`
+    : e.reason || e.message || (Object.keys(rest).length && type !== "call_ended" ? JSON.stringify(rest) : "");
+  if (e.type !== "call_ended") log(e.type, text);
+  switch (e.type) {
+    case "call_started": setStatus("Connected. Say hello."); break;
+    case "caller_said": fragment("caller", e.text); break;
+    case "assistant_said": fragment("assistant", e.text); break;
+    case "interrupted":
+      stopPlayback();
+      if (open?.speaker === "assistant") { open.el.classList.add("cut"); open = null; }
+      break;
+    case "turn_complete": if (open?.speaker === "assistant") open = null; break;
+    case "tool_call":
+      note(e.name === "end_call" ? `Assistant is hanging up: ${e.args.reason || ""}` : `Tool: ${e.name}`); break;
+    case "call_ending":
+      stopMic(); setStatus("Call ended. Writing the summary…"); setButtons(false, true); break;
+    case "error": setStatus(e.message); break;
+    case "call_ended":
+      log("call_ended", `${e.call.turns.length} turns, ${e.call.duration_seconds}s`);
+      renderCall(e.call); setStatus("Done."); loadCalls(); loadExpected(); loadBrief(); break;
+  }
+}
+
+function renderCall(call) {
+  clearTranscript();
+  if (!call.turns.length) $("#transcript").innerHTML = `<p class="empty">Nothing was said.</p>`;
+  for (const t of call.turns) {
+    const el = bubble(t.speaker, t.text);
+    el.querySelector(".who").textContent += ` · ${t.at.toFixed(1)}s`;
+    if (t.interrupted) el.classList.add("cut");
+  }
+  const s = call.summary, box = $("#summary");
+  box.style.display = "block";
+  if (!s) { box.innerHTML = `<p class="empty">No summary: the caller didn't say anything.</p>`; return; }
+  const esc = (x) => String(x).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const list = (items) => items.length ? `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>` : "";
+  box.innerHTML = `
+    <div class="badges">
+      <span class="badge ${s.category}">${esc(s.category)}</span>
+      <span class="badge ${s.scam_risk}">scam risk: ${esc(s.scam_risk)}</span>
+      <span class="badge">${esc(s.language)}</span>
+      <span class="badge">${call.duration_seconds}s · ended by ${esc(call.ended_by)}</span>
+      <span class="badge">voice: ${esc(call.voice || "default")}</span>
+    </div>
+    <p><b>${esc(s.summary)}</b></p>
+    <p>Caller: ${esc(s.caller || "didn't say")} · Purpose: ${esc(s.purpose)}</p>
+    ${s.scam_signals.length ? `<p>Warning signs:</p>${list(s.scam_signals)}` : ""}
+    ${s.action_items.length ? `<p>To do:</p>${list(s.action_items)}` : ""}`;
+}
+
+async function loadCalls() {
+  const res = await fetch("/v1/calls?limit=10");
+  if (!res.ok) return;
+  const calls = await res.json();
+  const box = $("#calls");
+  if (!calls.length) return;
+  box.innerHTML = "";
+  for (const c of calls) {
+    const b = document.createElement("button");
+    const when = new Date(c.started_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    b.innerHTML = `<small>${when} · ${c.caller_number || "withheld"} · ${c.summary ? c.summary.category : "no summary"} · ${c.voice || "default voice"}</small><br>`;
+    b.append(document.createTextNode(c.summary ? c.summary.summary : `${c.turns.length} turns`));
+    b.onclick = () => { $("#log").innerHTML = ""; renderCall(c); };
+    box.append(b);
+  }
+}
+
+function setButtons(inCall, ending = false) {
+  $("#start").disabled = inCall;
+  $("#end").disabled = !inCall || ending;
+  $("#typed").disabled = !inCall || ending;
+  $("#send").disabled = !inCall || ending;
+}
+
+$("#start").onclick = start;
+$("#preview").onclick = preview;
+function sampleChanged() {
+  previewAudio?.pause();
+  $("#preview").textContent = "▶ Preview";
+  $("#voiceNote").textContent = "";
+  try { localStorage.setItem("lang", $("#lang").value); } catch {}
+  loadScript();
+}
+$("#voice").onchange = sampleChanged;
+$("#lang").onchange = sampleChanged;
+$("#owner").onchange = () => { loadScript(); saveProfile(); };
+$("#caller").onchange = () => { try { localStorage.setItem("caller", $("#caller").value.trim()); } catch {} loadBrief(); };
+$("#saveAbout").onclick = saveProfile;
+$("#expectForm").onsubmit = addExpected;
+loadProfile().then(() => Promise.all([loadVoices(), loadLanguages()])).then(() => { loadScript(); loadBrief(); });
+loadExpected();
+$("#end").onclick = () => { ws?.send(JSON.stringify({ type: "end" })); setStatus("Hanging up…"); };
+$("#typeForm").onsubmit = (ev) => {
+  ev.preventDefault();
+  const text = $("#typed").value.trim();
+  if (!text || ws?.readyState !== WebSocket.OPEN) return;
+  ws.send(JSON.stringify({ type: "text", text }));
+  open = { speaker: "caller", el: bubble("caller", text) }; open = null;
+  log("you typed", JSON.stringify(text));
+  $("#typed").value = "";
+};
+loadCalls();
+</script>
+</body>
+</html>

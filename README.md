@@ -9,8 +9,8 @@ An AI call assistant that protects families from scam calls. Unknown callers rea
 | Path | What |
 |---|---|
 | `apps/web` | Website and waitlist (Next.js 16, Tailwind CSS 4). Runs on Cloud Run behind Firebase Hosting |
-| `apps/android` | Android app (planned, Kotlin) |
-| `services/voice` | Voice backend on Cloud Run: Gemini Live, the phone line, WhatsApp (planned) |
+| `apps/android` | Android app (Kotlin, Jetpack Compose) |
+| `services/api` | Backend on Cloud Run (Python, FastAPI): sign-in, accounts, Gemini Live on Vertex AI, and soon the phone line. See [its README](services/api/README.md) |
 | `brand/` | Logo and brand assets |
 | `docs/` | Research (competitors, scams), pricing, hackathon notes, infrastructure |
 

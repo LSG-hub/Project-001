@@ -1,0 +1,97 @@
+name: Android dev build
+
+# Every merge into dev that touches the Android app: build "001 Dev" and send it to the
+# Firebase App Distribution group "dev-testers". Testers get an email with an install link.
+# Signs in to Google Cloud with Workload Identity Federation: no keys stored in GitHub.
+# Secrets: ANDROID_DEV_KEYSTORE_BASE64, ANDROID_DEV_KEYSTORE_PASSWORD, FIREBASE_ANDROID_DEV_APP_ID.
+on:
+  push:
+    branches: [dev]
+    paths:
+      - apps/android/**
+      - .github/workflows/android-dev.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: android-dev
+  cancel-in-progress: true
+
+jobs:
+  distribute:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/android
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50 # for the release notes
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/701356728707/locations/global/workloadIdentityPools/github/providers/lsg-hub
+          service_account: github-deployer@project-001-474105.iam.gserviceaccount.com
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_DEV_KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/dev-signing.jks"
+
+      - name: Firebase config for the app
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_ANDROID_DEV_APP_ID }}
+        run: |
+          npx --yes firebase-tools@15.26.0 apps:sdkconfig ANDROID "$FIREBASE_APP_ID" --project project-001-474105 > "$RUNNER_TEMP/sdk.txt"
+          KEY=$(python3 -c "import json,sys; t=open(sys.argv[1]).read(); print(json.loads(t[t.index('{'):])['client'][0]['api_key'][0]['current_key'])" "$RUNNER_TEMP/sdk.txt")
+          echo "::add-mask::$KEY"
+          echo "FIREBASE_DEV_API_KEY=$KEY" >> "$GITHUB_ENV"
+          echo "FIREBASE_DEV_APP_ID=$FIREBASE_APP_ID" >> "$GITHUB_ENV"
+
+      - name: Build 001 Dev
+        env:
+          ANDROID_DEV_KEYSTORE: ${{ runner.temp }}/dev-signing.jks
+          ANDROID_DEV_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_DEV_KEYSTORE_PASSWORD }}
+        run: |
+          # Builds sent by hand use small version codes; CI counts up from 101, so a CI
+          # build is always newer and installs over a hand-sent one.
+          export BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 100))
+          ./gradlew :app:assembleDev --no-daemon
+
+      - name: Release notes
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          {
+            echo "Build ${GITHUB_SHA::7} from dev."
+            echo
+            if git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+              git log --format='- %s' "$BEFORE..$GITHUB_SHA" -- .
+            else
+              git log -n 5 --format='- %s' -- .
+            fi
+          } > "$RUNNER_TEMP/notes.txt"
+          cat "$RUNNER_TEMP/notes.txt"
+
+      - name: Send to testers
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_ANDROID_DEV_APP_ID }}
+        run: |
+          npx --yes firebase-tools@15.26.0 appdistribution:distribute app/build/outputs/apk/dev/app-dev.apk \
+            --app "$FIREBASE_APP_ID" --groups dev-testers \
+            --release-notes-file "$RUNNER_TEMP/notes.txt" \
+            --project project-001-474105

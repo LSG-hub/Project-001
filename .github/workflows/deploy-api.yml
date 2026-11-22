@@ -1,0 +1,79 @@
+name: Deploy API
+
+# dev  -> Cloud Run api-dev (Firestore "development")
+# main -> Cloud Run api     (Firestore "(default)")
+# Signs in to Google Cloud with Workload Identity Federation: no keys stored in GitHub.
+# Every deploy re-applies the service's size and settings, so this file is the source of truth.
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - services/api/**
+      - .github/workflows/deploy-api.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-api-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: project-001-474105
+  REGION: asia-south1
+  IMAGE: asia-south1-docker.pkg.dev/project-001-474105/api/api
+  RUNTIME_SA: api-runtime@project-001-474105.iam.gserviceaccount.com
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+    env:
+      SERVICE: ${{ github.ref_name == 'main' && 'api' || 'api-dev' }}
+      API_ENV: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+      FIRESTORE_DB: ${{ github.ref_name == 'main' && '(default)' || 'development' }}
+      MAX_INSTANCES: ${{ github.ref_name == 'main' && '10' || '2' }}
+      # Both scale to zero for now. When the phone line is live, set prod to '1' so a
+      # caller never waits on a cold start (about $10/month, see docs/infra/gcp.md).
+      MIN_INSTANCES: ${{ github.ref_name == 'main' && '0' || '0' }}
+      # Dev only, until the phone line exists: signed-in test calls from the app, and any
+      # 6-digit code signs you in. Prod ignores both even if set.
+      DEV_ONLY_ENV: ${{ github.ref_name == 'main' && '' || ',API_TEST_CALLS=true,API_VERIFICATION_ACCEPT_ANY_CODE=true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/701356728707/locations/global/workloadIdentityPools/github/providers/lsg-hub
+          service_account: github-deployer@project-001-474105.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push the image
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker build -t "$IMAGE:$GITHUB_SHA" services/api
+          docker push "$IMAGE:$GITHUB_SHA"
+
+      # 1 vCPU / 512 MiB: the app idles at ~120 MB. Concurrency 20 keeps audio
+      # smooth when calls arrive (each live call holds one request open). Timeout
+      # 3600 s is Cloud Run's maximum, for long calls. Scales to zero when idle.
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --project "$PROJECT_ID" --region "$REGION" \
+            --image "$IMAGE:$GITHUB_SHA" \
+            --service-account "$RUNTIME_SA" \
+            --cpu 1 --memory 512Mi --cpu-boost \
+            --concurrency 20 --min-instances "$MIN_INSTANCES" --max-instances "$MAX_INSTANCES" \
+            --timeout 3600 \
+            --set-env-vars "API_ENV=$API_ENV,API_STORE=firestore,API_FIRESTORE_DATABASE=$FIRESTORE_DB,API_AUTH=firebase,API_FIREBASE_SIGNER=$RUNTIME_SA$DEV_ONLY_ENV" \
+            --quiet
+
+      - name: Check it's up
+        run: |
+          URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT_ID" --region "$REGION" --format 'value(status.url)')
+          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health"

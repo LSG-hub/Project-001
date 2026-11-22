@@ -1,0 +1,90 @@
+[project]
+name = "project001-api"
+version = "0.1.0"
+description = "001 backend: the API for the app and the phone line (FastAPI, Gemini Live on Vertex AI)."
+authors = [
+    { name = "Sreenivas Gurram", email = "me@sreenivasgurram.com" }
+]
+requires-python = ">=3.13"
+license = "AGPL-3.0-only"
+dependencies = [
+    "fastapi>=0.165.0",
+    "firebase-admin>=7.8.0",
+    "google-cloud-firestore>=2.34.1",
+    "google-genai>=3.6.1",
+    "phonenumbers>=9.0.44",
+    "pydantic-settings>=2.16.3",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "import-linter>=2.17",
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+    "ruff>=0.17.6",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ASYNC", "S", "RUF"]
+ignore = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B", "ASYNC240"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["firebase_admin.*", "phonenumbers.*", "google.cloud.firestore.*"]
+ignore_missing_imports = true
+
+# Architecture rules, checked in CI with `lint-imports`.
+[tool.importlinter]
+root_package = "project001_api"
+
+[[tool.importlinter.contracts]]
+name = "Layers: the composition root on top, then modules, then adapters, then core"
+type = "layers"
+layers = [
+    "project001_api.main",
+    "project001_api.container",
+    "project001_api.modules",
+    "project001_api.adapters",
+    "project001_api.core",
+]
+
+[[tool.importlinter.contracts]]
+name = "Modules are independent: they talk through ports wired in the container"
+type = "independence"
+modules = [
+    "project001_api.modules.health",
+    "project001_api.modules.accounts",
+    "project001_api.modules.verification",
+    "project001_api.modules.calls",
+    "project001_api.modules.context",
+]
+
+[[tool.importlinter.contracts]]
+name = "Modules don't reach for adapters directly"
+type = "forbidden"
+source_modules = ["project001_api.modules"]
+forbidden_modules = ["project001_api.adapters"]

@@ -23,7 +23,7 @@ Cloud Run, Vertex AI (`aiplatform`), Artifact Registry, Cloud Build, Firebase, F
 | Piece | Runs on | Address |
 |---|---|---|
 | Website (Next.js) | Cloud Run, `asia-south1` (Mumbai) | `001.sreenivasgurram.com`, via a Firebase Hosting rewrite to the Cloud Run service |
-| Voice backend (FastAPI + WebSockets) | Cloud Run, `asia-south1` | its own `*.run.app` URL. Firebase Hosting rewrites time out at 60 s, so voice sockets can't go through them |
+| Backend `services/api` (FastAPI + WebSockets) | Cloud Run `api-dev` / `api`, `asia-south1` | its own `*.run.app` URL. Firebase Hosting rewrites time out at 60 s, so voice sockets can't go through them |
 | Data | Firestore | — |
 | Gemini Live | Vertex AI `gemini-3.8-live`, `asia-south1` | — |
 
@@ -61,3 +61,22 @@ gcloud config set project project-001-474105
 - Run on pushes to `dev` and `main` that touch the website.
 - GitHub signs in through Workload Identity Federation: pool `github`, provider `lsg-hub`, limited to `LSG-hub/Project-001` on `refs/heads/dev` and `refs/heads/main`. It acts as `github-deployer`, which has `run.developer`, `artifactregistry.writer` on repo `web`, and `serviceAccountUser` on `web-runtime`. No keys are stored in GitHub.
 - Firebase Hosting config and Firestore rules are deployed by hand when they change: `firebase deploy --only hosting:dev,hosting:prod,firestore:rules`.
+
+## Backend (`services/api`)
+
+| | Dev | Prod |
+|---|---|---|
+| Cloud Run service | `api-dev` | `api` |
+| Firestore database | `development` | `(default)` |
+| Min instances | 0 (scales to zero) | 0 for now; 1 once the phone line is live |
+| Max instances | 2 | 10 |
+
+**Size (both):** 1 vCPU, 512 MiB, startup CPU boost, concurrency 20, request timeout 3600 s (Cloud Run's maximum, for long calls). The app idles at about 120 MB. Cloud Run has no disk: the filesystem lives in memory, and the service writes nothing to it (data goes to Firestore).
+
+**When the phone line goes live:** set prod min instances to 1 (`MIN_INSTANCES` in the workflow) so a caller never waits on a cold start. One warm instance (1 vCPU, 512 MiB, request-based billing) costs about $9.86/month at the idle rate ($0.0000025 per vCPU-second and per GiB-second, Tier 1, which includes Mumbai). That is about 90% of one monthly Developer Program credit. Also load-test concurrency with real audio.
+
+**Runtime account `api-runtime`:** `datastore.user` (Firestore), `aiplatform.user` (Gemini on Vertex AI), and `iam.serviceAccountTokenCreator` on itself (signs Firebase Auth custom tokens through IAM, since there is no key file).
+
+**Android dev builds** (`.github/workflows/android-dev.yml`): on merges into `dev` that touch `apps/android`, the workflow builds "001 Dev" and sends it with Firebase App Distribution to the group `dev-testers`. `github-deployer` has `firebaseappdistro.admin` for this. The Firebase Android app is `app.project001.dev`; its app ID is a GitHub secret.
+
+**Deploys** (`.github/workflows/deploy-api.yml`) run on pushes to `dev` and `main` that touch `services/api`. `github-deployer` also has `artifactregistry.writer` on repo `api` and `serviceAccountUser` on `api-runtime`. The workflow re-applies size and settings on every deploy. Public access (`allUsers` → `run.invoker`) was granted by hand once per service, because the deployer can't change IAM.
